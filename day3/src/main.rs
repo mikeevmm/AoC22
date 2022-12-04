@@ -132,6 +132,7 @@ struct Group {
 impl From<[String; 3]> for Group {
     fn from(lines: [String; 3]) -> Self {
         Group {
+            // FIXME: There's some unsafe efficiency trickery to be done here.
             lines: [
                 lines[0].bytes().collect(),
                 lines[1].bytes().collect(),
