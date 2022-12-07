@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 type FsFileId = usize;
 const ROOT_FID: FsFileId = 0;
@@ -23,8 +23,8 @@ impl FsFile {
     }
 }
 
-type Metadata = HashMap<FsFileId, HashMap<String, FsFileId>>;
-type Inodes = HashMap<FsFileId, FsFile>;
+type Metadata = BTreeMap<FsFileId, BTreeMap<String, FsFileId>>;
+type Inodes = BTreeMap<FsFileId, FsFile>;
 
 #[derive(Debug)]
 pub struct FileSystem {
@@ -37,9 +37,9 @@ pub struct FileSystem {
 
 impl FileSystem {
     pub fn new(total_size: u64) -> Self {
-        let mut metadata = HashMap::new();
-        metadata.insert(ROOT_FID, HashMap::new());
-        let mut inodes = HashMap::new();
+        let mut metadata = BTreeMap::new();
+        metadata.insert(ROOT_FID, BTreeMap::new());
+        let mut inodes = BTreeMap::new();
         inodes.insert(
             ROOT_FID,
             FsFile {
@@ -73,7 +73,7 @@ impl FileSystem {
             size: 0,
         };
         self.inodes.insert(fsid, dir);
-        self.metadata.insert(fsid, HashMap::new());
+        self.metadata.insert(fsid, BTreeMap::new());
         self.metadata
             .get_mut(&self.pwd)
             .expect("pwd to have metadata")

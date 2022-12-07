@@ -11,7 +11,7 @@ use nom::{
     sequence::{preceded, terminated},
 };
 
-fn next(i: &str) -> nom::IResult<&str, &str> {
+fn word_delimiter(i: &str) -> nom::IResult<&str, &str> {
     if opt(eof)(i)?.1.is_some() {
         return Ok((i, &""));
     }
@@ -57,7 +57,7 @@ fn word(i: &str) -> nom::IResult<&str, String> {
 fn command(i: &str) -> nom::IResult<&str, Vec<String>> {
     preceded(
         tag("$ "),
-        terminated(separated_list1(char(' '), word), next),
+        terminated(separated_list1(char(' '), word), word_delimiter),
     )(i)
 }
 
