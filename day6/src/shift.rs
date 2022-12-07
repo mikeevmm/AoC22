@@ -30,11 +30,13 @@ impl<const N: usize, T> CircularBuffer<N, T> {
 
     /// Returns the ith element in order of newest to oldest.
     pub fn ith_newest(&self, i: usize) -> &T {
+        debug_assert!(i < N);
         &self.inner[(self.start + i) % N]
     }
 
     /// Returns the ith element in order of oldest to newest.
     pub fn ith_oldest(&self, i: usize) -> &T {
+        debug_assert!(i < N);
         &self.inner[(self.start + N - 1 - i) % N]
     }
 }
