@@ -12,4 +12,6 @@ As usual, these done are to my best knowledge at the time of writing, but you sh
 
 **Day 6**: Part 1 is solved naïvely, because it's a fixed 9 comparisons, and I thought thinking any more about it would be wasted effort. Part 2 uses a properly clever approach.For it I wrote a basic ring buffer.
 
+**Day 10**: I really enjoyed this one.
+
 [aoc22]: https://adventofcode.com/2022/
