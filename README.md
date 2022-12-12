@@ -14,6 +14,6 @@ As usual, these done are to my best knowledge at the time of writing, but you sh
 
 **Day 10**: I really enjoyed this one.
 
-**Day 11**: I just couldn't get it done in a single day. Got one only one star.
+**Day 11**: I couldn't get it done in a single day.
 
 [aoc22]: https://adventofcode.com/2022/
