@@ -49,6 +49,20 @@ impl Operation {
             Operator::Mul => lvalue * rvalue,
         }
     }
+    
+    fn operate_under_ring(&self, in_value: usize, ring: usize) -> usize {
+        let lvalue = in_value;
+        let rvalue = match self.rvalue {
+            RValue::Old => in_value,
+            RValue::Literal(literal) => literal,
+        };
+        match self.operator {
+            Operator::Add => ((lvalue % ring) + (rvalue % ring)) % ring,
+            Operator::Sub => ((lvalue % ring) - (rvalue % ring)) % ring,
+            Operator::Mul => ((lvalue % ring) * (rvalue % ring)) % ring,
+        }
+        
+    }
 }
 
 impl Test {
@@ -70,32 +84,49 @@ impl Monkey {
 struct MonkeyBusiness {
     monkeys: Vec<Monkey>,
     monkey_number: usize,
+    ring: usize,
     inspection: Vec<usize>,
 }
 
 impl MonkeyBusiness {
     fn new(monkeys: Vec<Monkey>) -> Self {
         let size = monkeys.len();
+        let ring = monkeys.iter().fold(1, |acc, m| acc * m.test.divider);
         MonkeyBusiness {
             monkeys,
             monkey_number: size,
+            ring,
             inspection: vec![0; size],
         }
     }
 
-    fn round(&mut self, divide: bool) {
-        let monkey_number = self.monkeys.len();
-        for monkey_index in 0..monkey_number {
+    fn round(&mut self) {
+        for monkey_index in 0..self.monkey_number {
             loop {
                 let monkey = &mut self.monkeys[monkey_index];
                 let worry_level = monkey.items.pop_front();
                 if worry_level.is_none() {
                     break;
                 }
-                let mut worry_level = monkey.operation.operate(worry_level.unwrap());
-                if divide {
-                    worry_level /= 3;
+                let worry_level = monkey.operation.operate(worry_level.unwrap());
+                let worry_level = worry_level / 3;
+                let throw_to = monkey.throw_to(worry_level);
+                drop(monkey);
+                self.monkeys[throw_to].items.push_back(worry_level);
+                self.inspection[monkey_index] += 1;
+            }
+        }
+    }
+    
+    fn unbounded_round(&mut self) {
+        for monkey_index in 0..self.monkey_number {
+            loop {
+                let monkey = &mut self.monkeys[monkey_index];
+                let worry_level = monkey.items.pop_front();
+                if worry_level.is_none() {
+                    break;
                 }
+                let worry_level = monkey.operation.operate_under_ring(worry_level.unwrap(), self.ring);
                 let throw_to = monkey.throw_to(worry_level);
                 drop(monkey);
                 self.monkeys[throw_to].items.push_back(worry_level);
@@ -130,7 +161,7 @@ fn exampleinput1() {
     let mut monkey_business = MonkeyBusiness::new(monkeys);
 
     for _round in 0..20 {
-        monkey_business.round(true);
+        monkey_business.round();
     }
     
     assert_eq!(monkey_business.monkey_business(), 10605);
@@ -148,7 +179,7 @@ fn exampleinput2() {
     let mut monkey_business = MonkeyBusiness::new(monkeys);
 
     for _round in 0..10_000 {
-        monkey_business.round(false);
+        monkey_business.unbounded_round();
     }
     
     assert_eq!(monkey_business.monkey_business(), 2713310158);
@@ -159,7 +190,7 @@ fn part1() {
     let mut monkey_business = MonkeyBusiness::new(monkeys);
 
     for _round in 0..20 {
-        monkey_business.round(true);
+        monkey_business.round();
     }
     
     println!("Ooh ooh ahh: {}", monkey_business.monkey_business());
@@ -170,13 +201,13 @@ fn part2() {
     let mut monkey_business = MonkeyBusiness::new(monkeys);
 
     for _round in 0..10_000 {
-        monkey_business.round(false);
-        monkey_business.debug_inspections();
+        monkey_business.unbounded_round();
     }
     
     println!("Ooh ooh ahh: {}", monkey_business.monkey_business());
 }
 
 fn main() {
-    part2()
+    part1();
+    part2();
 }
